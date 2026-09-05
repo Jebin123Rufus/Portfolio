@@ -26,11 +26,8 @@ export const CyberTerminal: React.FC<{ isHeroEmbedded?: boolean }> = ({ isHeroEm
     }
   }, [logs]);
 
-  const handleCommandSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    const cmd = inputVal.trim();
+  const executeCommand = (rawCmd: string) => {
+    const cmd = rawCmd.trim();
     if (!cmd) return;
 
     soundFX.playClick();
@@ -50,12 +47,12 @@ export const CyberTerminal: React.FC<{ isHeroEmbedded?: boolean }> = ({ isHeroEm
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
               <div><span className="text-sky-300 font-bold">whoami</span> — Current user identity</div>
-              <div><span className="text-sky-300 font-bold">uname -a</span> — Kernel system information</div>
+              <div><span className="text-sky-300 font-bold">uname -a</span> — Kernel system info</div>
               <div><span className="text-[#dc2626] font-bold">ls</span> — List directory files</div>
               <div><span className="text-emerald-300 font-bold">cat &lt;file&gt;</span> — Read file contents</div>
               <div><span className="text-rose-500 font-bold">rufuzz</span> — Deauth-Defense CLI tool</div>
               <div><span className="text-amber-300 font-bold">chess</span> — Chess.com ELO stats</div>
-              <div><span className="text-rose-400 font-bold">thm</span> — TryHackMe global &amp; India rank</div>
+              <div><span className="text-rose-400 font-bold">thm</span> — TryHackMe global rank</div>
               <div><span className="text-slate-400 font-bold">clear</span> — Clear terminal output</div>
             </div>
           </div>
@@ -85,7 +82,7 @@ export const CyberTerminal: React.FC<{ isHeroEmbedded?: boolean }> = ({ isHeroEm
       case 'uname':
       case 'uname -a':
         responseOutput = (
-          <div className="text-sky-300 font-mono text-xs">
+          <div className="text-sky-300 font-mono text-xs break-all">
             Linux kali 6.8.0-kali1-amd64 #1 SMP PREEMPT_DYNAMIC Kali 6.8.0-1 (2026) x86_64 GNU/Linux
           </div>
         );
@@ -141,13 +138,13 @@ export const CyberTerminal: React.FC<{ isHeroEmbedded?: boolean }> = ({ isHeroEm
               <span>🛡️ DEAUTH-DEFENSE [RUFUZZ CLI ENGINE]</span>
               <span className="text-sky-400">v1.0.0</span>
             </div>
-            <div className="text-slate-300">usage: <span className="text-rose-400 font-bold">rufuzz</span> [--mode &#123;monitor|managed&#125;] [--interface IFACE]</div>
-            <div className="text-slate-400 text-[11px] pt-1">
+            <div className="text-slate-300 break-words">usage: <span className="text-rose-400 font-bold">rufuzz</span> [--mode &#123;monitor|managed&#125;] [--interface IFACE]</div>
+            <div className="text-slate-400 text-[11px] pt-1 leading-relaxed">
               • Monitor Mode: Direct 802.11 raw packet capture &amp; deauth frame detection<br />
               • Managed Mode: Connectivity disconnect anomaly monitoring fallback<br />
               • Incident Logging: logs/attacks.log | Defense action triggers
             </div>
-            <div className="text-sky-300 text-[11px] pt-0.5">
+            <div className="text-sky-300 text-[11px] pt-0.5 break-all">
               GitHub: <a href="https://github.com/Jebin123Rufus/Deauth-Defense" target="_blank" rel="noreferrer noopener" className="underline text-rose-400 hover:text-rose-300">github.com/Jebin123Rufus/Deauth-Defense</a>
             </div>
           </div>
@@ -188,7 +185,7 @@ export const CyberTerminal: React.FC<{ isHeroEmbedded?: boolean }> = ({ isHeroEm
       case 'cat contact.sh':
       case './contact.sh':
         responseOutput = (
-          <div className="text-slate-200 font-mono text-xs">
+          <div className="text-slate-200 font-mono text-xs break-words">
             Direct transmission endpoint ready. Scroll down to <span className="text-[#dc2626] font-bold">#contact</span> or email <span className="text-sky-400 font-bold">jebinrufuz@gmail.com</span> (GitHub: <span className="text-rose-400 font-bold">@Jebin123Rufus</span>).
           </div>
         );
@@ -218,7 +215,7 @@ export const CyberTerminal: React.FC<{ isHeroEmbedded?: boolean }> = ({ isHeroEm
       default:
         responseOutput = (
           <div className="text-rose-400 font-mono text-xs">
-            zsh: command not found: {cmd}. Type <span className="text-[#dc2626] underline cursor-pointer font-bold" onClick={() => setInputVal('help')}>help</span> or <span className="text-sky-400 underline cursor-pointer font-bold" onClick={() => setInputVal('ls')}>ls</span> for commands.
+            zsh: command not found: {cmd}. Type <span className="text-[#dc2626] underline cursor-pointer font-bold" onClick={() => executeCommand('help')}>help</span> or <span className="text-sky-400 underline cursor-pointer font-bold" onClick={() => executeCommand('ls')}>ls</span> for commands.
           </div>
         );
         break;
@@ -229,6 +226,12 @@ export const CyberTerminal: React.FC<{ isHeroEmbedded?: boolean }> = ({ isHeroEm
       { id: logId, type: 'input', command: cmd, output: responseOutput },
     ]);
     setInputVal('');
+  };
+
+  const handleCommandSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    executeCommand(inputVal);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -253,15 +256,18 @@ export const CyberTerminal: React.FC<{ isHeroEmbedded?: boolean }> = ({ isHeroEm
     }
   };
 
+  const QUICK_COMMANDS = ['help', 'whoami', 'ls', 'rufuzz', 'thm', 'chess', 'clear'];
+
   return (
-    <div className={`w-full glass-panel tech-corner rounded-2xl border border-red-900/40 shadow-[0_0_50px_rgba(185,28,28,0.2)] overflow-hidden select-text ${isHeroEmbedded ? '' : 'max-w-5xl mx-auto'}`}>
-      <div className="flex items-center justify-between px-4 py-3 bg-[#0a0203]/95 border-b border-red-900/30 font-mono text-xs">
+    <div className={`w-full glass-panel tech-corner rounded-2xl border border-red-900/40 shadow-[0_0_50px_rgba(185,28,28,0.25)] overflow-hidden select-text ${isHeroEmbedded ? '' : 'max-w-5xl mx-auto'}`}>
+      {/* Terminal Title Bar */}
+      <div className="flex items-center justify-between px-3.5 sm:px-4 py-2.5 sm:py-3 bg-[#0a0203]/95 border-b border-red-900/30 font-mono text-xs">
         <div className="flex items-center space-x-2">
-          <div className="w-3 h-3 rounded-full bg-red-600/80" />
-          <div className="w-3 h-3 rounded-full bg-amber-500/80" />
-          <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
-          <span className="ml-2 text-slate-200 flex items-center space-x-2 font-bold">
-            <TerminalIcon className="w-4 h-4 text-[#dc2626]" />
+          <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-600/80" />
+          <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-amber-500/80" />
+          <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-emerald-500/80" />
+          <span className="ml-1 sm:ml-2 text-slate-200 flex items-center space-x-1.5 sm:space-x-2 font-bold text-[11px] sm:text-xs">
+            <TerminalIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#dc2626]" />
             <span className="text-sky-400">root@kali</span>
             <span className="text-slate-500">:</span>
             <span className="text-[#dc2626]">~/rufuzz</span>
@@ -269,40 +275,45 @@ export const CyberTerminal: React.FC<{ isHeroEmbedded?: boolean }> = ({ isHeroEm
         </div>
         <div className="text-[10px] text-[#dc2626] flex items-center space-x-1.5 font-bold tracking-wider">
           <span className="w-2 h-2 rounded-full bg-[#dc2626] animate-ping" />
-          <span>KALI ZSH</span>
+          <span className="hidden xs:inline">KALI ZSH</span>
         </div>
       </div>
 
+      {/* Terminal Output & Prompt Body */}
       <div
         ref={consoleContainerRef}
         onClick={() => inputRef.current?.focus()}
-        className={`p-4 sm:p-5 font-mono text-xs sm:text-sm overflow-y-auto space-y-3 bg-[#040102]/95 ${isHeroEmbedded ? 'h-[280px] sm:h-[340px]' : 'h-[380px] sm:h-[450px]'}`}
+        className={`p-3.5 sm:p-5 font-mono text-xs sm:text-sm overflow-y-auto space-y-3 bg-[#040102]/95 touch-pan-y overscroll-contain ${
+          isHeroEmbedded ? 'h-[270px] sm:h-[330px]' : 'h-[360px] sm:h-[450px]'
+        }`}
+        style={{ WebkitOverflowScrolling: 'touch' }}
       >
         {logs.map((log) => (
           <div key={log.id} className="space-y-1">
             {log.type === 'input' && log.command && (
               <div className="space-y-0.5">
-                <div className="text-sky-400 font-bold flex items-center gap-1">
+                <div className="text-sky-400 font-bold flex items-center gap-1 text-[11px] sm:text-xs">
                   <span>┌──(</span>
                   <span className="text-[#dc2626]">root㉿kali</span>
                   <span>)-[</span>
                   <span className="text-white">~/rufuzz</span>
                   <span>]</span>
                 </div>
-                <div className="flex items-center space-x-2 text-slate-200 pl-1">
+                <div className="flex items-center space-x-2 text-slate-200 pl-1 text-[11px] sm:text-xs">
                   <span className="text-sky-400 font-bold">└─#</span>
                   <span className="font-bold text-[#dc2626]">{log.command}</span>
                 </div>
               </div>
             )}
-            <div className="pl-3 border-l-2 border-red-900/40 text-slate-200">
+            <div className="pl-2.5 sm:pl-3 border-l-2 border-red-900/40 text-slate-200 break-words">
               {log.output}
             </div>
           </div>
         ))}
 
+        {/* Input Form */}
         <form onSubmit={handleCommandSubmit} className="space-y-0.5 pt-1">
-          <div className="text-sky-400 font-bold flex items-center gap-1 text-xs sm:text-sm">
+          <div className="text-sky-400 font-bold flex items-center gap-1 text-[11px] sm:text-xs">
             <span>┌──(</span>
             <span className="text-[#dc2626]">root㉿kali</span>
             <span>)-[</span>
@@ -317,19 +328,41 @@ export const CyberTerminal: React.FC<{ isHeroEmbedded?: boolean }> = ({ isHeroEm
               value={inputVal}
               onChange={(e) => setInputVal(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="type 'help' or 'ls'..."
-              className="flex-1 bg-transparent text-red-200 focus:outline-none font-mono text-xs sm:text-sm placeholder:text-slate-600 font-semibold"
+              placeholder="type 'help' or tap below..."
+              className="flex-1 bg-transparent text-red-200 focus:outline-none font-mono text-xs sm:text-sm placeholder:text-slate-600 font-semibold py-1"
               aria-label="Terminal input"
               autoComplete="off"
               autoCorrect="off"
               autoCapitalize="off"
               spellCheck={false}
             />
-            <button type="submit" className="text-slate-500 hover:text-[#dc2626] cursor-pointer" aria-label="Submit command">
+            <button
+              type="submit"
+              className="text-slate-500 hover:text-[#dc2626] cursor-pointer p-1 active:scale-90"
+              aria-label="Submit command"
+            >
               <CornerDownLeft className="w-4 h-4" />
             </button>
           </div>
         </form>
+      </div>
+
+      {/* Quick Tap Helper Chips (Especially helpful for mobile users) */}
+      <div className="px-3 py-2 bg-[#080203] border-t border-red-900/30 flex items-center gap-1.5 overflow-x-auto no-scrollbar font-mono text-[10px]">
+        <span className="text-slate-500 shrink-0 font-bold hidden sm:inline">QUICK:</span>
+        {QUICK_COMMANDS.map((cmd) => (
+          <button
+            key={cmd}
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              executeCommand(cmd);
+            }}
+            className="px-2 py-0.5 rounded bg-red-950/40 hover:bg-red-900/50 text-red-300 hover:text-white border border-red-900/40 transition-colors cursor-pointer shrink-0 font-medium active:scale-95"
+          >
+            {cmd}
+          </button>
+        ))}
       </div>
     </div>
   );

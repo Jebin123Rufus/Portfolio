@@ -25,7 +25,7 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-transparent text-slate-100 relative overflow-hidden select-none">
+    <main className="min-h-screen bg-transparent text-slate-100 relative overflow-x-hidden select-none">
       <StarfieldBackground />
       <div className="film-grain" />
       <div className="cinematic-vignette" />

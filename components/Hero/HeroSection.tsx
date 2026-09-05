@@ -16,13 +16,22 @@ export const HeroSection: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const subtitleRef = useRef<HTMLDivElement>(null);
-  const ctaRef = useRef<HTMLDivElement>(null);
   const terminalWrapperRef = useRef<HTMLDivElement>(null);
 
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [isDesktop, setIsDesktop] = useState(false);
   const { scrollY } = useScroll();
-  const yParallax = useTransform(scrollY, [0, 500], [0, 120]);
-  const opacityParallax = useTransform(scrollY, [0, 400], [1, 0]);
+  const yParallax = useTransform(scrollY, [0, 600], [0, 100]);
+  const opacityParallax = useTransform(scrollY, [0, 500], [1, 0]);
+
+  useEffect(() => {
+    const checkScreen = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+    checkScreen();
+    window.addEventListener('resize', checkScreen);
+    return () => window.removeEventListener('resize', checkScreen);
+  }, []);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -45,25 +54,27 @@ export const HeroSection: React.FC = () => {
         { y: 0, opacity: 1, filter: 'blur(0px)', duration: 1.1, delay: 0.2 }
       )
         .fromTo(subtitleRef.current, { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8 }, '-=0.6')
-        .fromTo(ctaRef.current, { y: 25, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8 }, '-=0.4')
         .fromTo(
           terminalWrapperRef.current,
           { scale: 0.9, opacity: 0, rotateY: 15 },
           { scale: 1, opacity: 1, rotateY: 0, duration: 1 },
-          '-=0.8'
+          '-=0.6'
         );
 
-      gsap.to(containerRef.current, {
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: 'top top',
-          end: 'bottom top',
-          scrub: true,
-        },
-        scale: 0.96,
-        opacity: 0.6,
-        filter: 'blur(4px)',
-      });
+      // Only apply scroll scaling & blur on large desktop screens so mobile view never loses the terminal
+      if (window.innerWidth >= 1024) {
+        gsap.to(containerRef.current, {
+          scrollTrigger: {
+            trigger: containerRef.current,
+            start: 'top top',
+            end: 'bottom top',
+            scrub: true,
+          },
+          scale: 0.96,
+          opacity: 0.6,
+          filter: 'blur(4px)',
+        });
+      }
     }, containerRef);
 
     return () => ctx.revert();
@@ -72,14 +83,19 @@ export const HeroSection: React.FC = () => {
   const handleScrollToSection = (id: string) => {
     soundFX.playClick();
     const target = document.querySelector(id);
-    if (target) target.scrollIntoView({ behavior: 'smooth' });
+    if (target) {
+      const headerOffset = 70;
+      const elementPosition = target.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+      window.scrollTo({ top: Math.max(0, offsetPosition), behavior: 'smooth' });
+    }
   };
 
   return (
     <section
       ref={containerRef}
       id="hero"
-      className="relative min-h-screen pt-28 pb-16 flex flex-col justify-center overflow-hidden cinematic-grid select-none bg-transparent"
+      className="relative min-h-screen pt-24 sm:pt-28 pb-16 flex flex-col justify-center overflow-visible lg:overflow-hidden cinematic-grid select-none bg-transparent"
     >
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <motion.div
@@ -90,41 +106,41 @@ export const HeroSection: React.FC = () => {
       </div>
 
       <motion.div
-        style={{ y: yParallax, opacity: opacityParallax }}
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full z-10 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center my-auto"
+        style={isDesktop ? { y: yParallax, opacity: opacityParallax } : undefined}
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center my-auto"
       >
         <div className="lg:col-span-6 space-y-6 text-left">
           <div className="space-y-3">
             <h1
               ref={titleRef}
-              className="text-5xl sm:text-7xl lg:text-8xl font-black font-mono tracking-tight text-white uppercase drop-shadow-[0_0_40px_rgba(220,38,38,0.5)] leading-none"
+              className="text-4xl sm:text-7xl lg:text-8xl font-black font-mono tracking-tight text-white uppercase drop-shadow-[0_0_40px_rgba(220,38,38,0.5)] leading-none"
             >
               JEBIN RUFUS R<span className="text-[#dc2626]">.</span>
             </h1>
             <div
               ref={subtitleRef}
-              className="flex items-center space-x-3 text-lg sm:text-2xl font-mono text-red-gradient font-bold tracking-wider"
+              className="flex flex-wrap items-center gap-2 text-base sm:text-2xl font-mono text-red-gradient font-bold tracking-wider"
             >
               <span className="text-[#dc2626]">SOFTWARE ENGINEER</span>
-              <span className="text-[#990000]">•</span>
+              <span className="text-[#990000] hidden sm:inline">•</span>
               <span className="text-[#dc2626]">CYBERSECURITY</span>
             </div>
           </div>
 
-          <p className="text-slate-300 font-sans text-base sm:text-lg max-w-xl leading-relaxed">
+          <p className="text-slate-300 font-sans text-sm sm:text-lg max-w-xl leading-relaxed">
             Software engineering student focused on cybersecurity, penetration testing, and web application security — deconstructing systems to build stronger defenses, full-stack platforms, and AI-driven security tools.
           </p>
         </div>
 
-        <div ref={terminalWrapperRef} className="lg:col-span-6 flex items-center justify-center">
-          <div className="w-full">
+        <div id="terminal" ref={terminalWrapperRef} className="lg:col-span-6 flex items-center justify-center w-full">
+          <div className="w-full max-w-full">
             <CyberTerminal isHeroEmbedded />
           </div>
         </div>
       </motion.div>
 
       <div
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center space-y-2 cursor-pointer z-20"
+        className="mt-8 lg:mt-0 lg:absolute lg:bottom-6 left-1/2 lg:-translate-x-1/2 flex flex-col items-center space-y-2 cursor-pointer z-20 pb-4"
         onClick={() => handleScrollToSection('#skills')}
       >
         <span className="font-mono text-[10px] text-red-400/80 tracking-widest uppercase">SCROLL FOR STORY</span>

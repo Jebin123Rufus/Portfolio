@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <rect width="64" height="64" rx="14" fill="#050102" />
+  <rect x="2" y="2" width="60" height="60" rx="12" stroke="#dc2626" stroke-width="2.5" stroke-opacity="0.85" />
+  <!-- Cyber Reticles -->
+  <line x1="8" y1="8" x2="14" y2="8" stroke="#dc2626" stroke-width="1.5" />
+  <line x1="8" y1="8" x2="8" y2="14" stroke="#dc2626" stroke-width="1.5" />
+  <line x1="56" y1="56" x2="50" y2="56" stroke="#dc2626" stroke-width="1.5" />
+  <line x1="56" y1="56" x2="56" y2="50" stroke="#dc2626" stroke-width="1.5" />
+  
+  <!-- Stylized Capital P -->
+  <path d="M19 13H36C43.1797 13 49 18.8203 49 26C49 33.1797 43.1797 39 36 39H27V51H19V13Z" fill="url(#p-grad)" />
+  <path d="M27 21H35.5C38.5376 21 41 23.4624 41 26.5C41 29.5376 38.5376 32 35.5 32H27V21Z" fill="#050102" />
+  
+  <defs>
+    <linearGradient id="p-grad" x1="19" y1="13" x2="49" y2="51" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffffff" />
+      <stop offset="0.25" stop-color="#fca5a5" />
+      <stop offset="0.65" stop-color="#dc2626" />
+      <stop offset="1" stop-color="#880000" />
+    </linearGradient>
+  </defs>
+</svg>

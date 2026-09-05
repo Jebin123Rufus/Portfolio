@@ -50,7 +50,12 @@ export const metadata: Metadata = {
     description: 'Software Engineering & Cybersecurity Portfolio',
   },
   icons: {
-    icon: '/favicon.ico',
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+    ],
+    shortcut: '/icon.svg',
+    apple: '/icon.svg',
   },
 };
 
@@ -61,6 +66,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
+      <head>
+        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+        <link rel="alternate icon" href="/favicon.svg" type="image/svg+xml" />
+      </head>
       <body className="antialiased bg-[#000000] text-slate-100 selection:bg-rose-500/30 selection:text-white">
         {children}
       </body>

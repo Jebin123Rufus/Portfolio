@@ -37,20 +37,26 @@ export const Navigation: React.FC = () => {
     setMobileMenuOpen(false);
     const element = document.querySelector(href);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      const headerOffset = 70;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+      window.scrollTo({
+        top: Math.max(0, offsetPosition),
+        behavior: 'smooth',
+      });
     }
   };
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-40 transition-all duration-400 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-400 ${
         isScrolled
-          ? 'py-3 bg-[#000000]/90 backdrop-blur-xl border-b border-rose-900/30 shadow-[0_10px_30px_rgba(0,0,0,0.9)]'
-          : 'py-5 bg-transparent'
+          ? 'py-3 bg-[#000000]/95 backdrop-blur-xl border-b border-rose-900/40 shadow-[0_10px_30px_rgba(0,0,0,0.9)]'
+          : 'py-4 sm:py-5 bg-gradient-to-b from-black/80 to-transparent backdrop-blur-sm'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-        {/* Brand Identity Logo - Clean Name Only */}
+        {/* Brand Identity Logo */}
         <a
           href="#hero"
           onClick={(e) => {
@@ -84,37 +90,42 @@ export const Navigation: React.FC = () => {
           ))}
         </nav>
 
-        {/* Controls */}
-        <div className="hidden sm:flex items-center space-x-3">
-          {/* Audio FX Toggle */}
+        {/* Controls - Desktop & Tablet */}
+        <div className="flex items-center space-x-2 sm:space-x-3">
+          {/* Audio FX Toggle (Visible across all screens) */}
           <button
             onClick={toggleAudio}
             onMouseEnter={() => soundFX.playHover()}
             title={audioEnabled ? 'Mute Audio FX' : 'Enable Audio FX'}
-            className="flex items-center space-x-2 font-mono text-xs px-3.5 py-1.5 rounded-xl border border-rose-900/30 bg-[#0a0304] hover:border-rose-500 text-slate-200 hover:text-rose-300 transition-all cursor-pointer shadow-md"
+            aria-label={audioEnabled ? 'Mute Audio FX' : 'Enable Audio FX'}
+            className="flex items-center space-x-1.5 sm:space-x-2 font-mono text-xs px-2.5 sm:px-3.5 py-1.5 rounded-xl border border-rose-900/40 bg-[#0a0304] hover:border-rose-500 text-slate-200 hover:text-rose-300 transition-all cursor-pointer shadow-md active:scale-95"
           >
             {audioEnabled ? (
               <>
                 <Volume2 className="w-4 h-4 text-emerald-400 animate-pulse" />
-                <span className="text-emerald-400 font-bold tracking-wider">AUDIO ON</span>
+                <span className="text-emerald-400 font-bold tracking-wider text-[11px] sm:text-xs">AUDIO ON</span>
               </>
             ) : (
               <>
                 <VolumeX className="w-4 h-4 text-slate-500" />
-                <span className="text-slate-400 tracking-wider">AUDIO OFF</span>
+                <span className="text-slate-400 tracking-wider text-[11px] sm:text-xs hidden xs:inline">AUDIO OFF</span>
               </>
             )}
           </button>
-        </div>
 
-        {/* Mobile Menu Button */}
-        <div className="flex sm:hidden items-center space-x-2">
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 rounded-lg bg-[#0a0304] border border-rose-900/30 text-rose-400"
-          >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+          {/* Mobile / Tablet Menu Button (Visible for all screens below lg) */}
+          <div className="flex lg:hidden items-center">
+            <button
+              onClick={() => {
+                soundFX.playClick();
+                setMobileMenuOpen(!mobileMenuOpen);
+              }}
+              aria-label={mobileMenuOpen ? 'Close Menu' : 'Open Menu'}
+              className="p-2 rounded-xl bg-[#0a0304] border border-rose-900/40 text-rose-400 hover:text-rose-300 hover:border-rose-600 transition-all cursor-pointer active:scale-95 shadow-md"
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -125,7 +136,8 @@ export const Navigation: React.FC = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="sm:hidden bg-[#000000] border-b border-rose-900/30 px-6 py-6 font-mono space-y-4 shadow-2xl"
+            transition={{ duration: 0.25, ease: 'easeInOut' }}
+            className="lg:hidden bg-[#040102]/98 backdrop-blur-2xl border-b border-rose-900/40 px-6 py-5 font-mono space-y-2 shadow-[0_20px_40px_rgba(0,0,0,0.95)]"
           >
             {NAV_ITEMS.map((item) => (
               <a
@@ -135,9 +147,10 @@ export const Navigation: React.FC = () => {
                   e.preventDefault();
                   handleNavClick(item.href);
                 }}
-                className="block text-sm text-slate-200 hover:text-rose-400 py-2 border-b border-rose-900/20 font-semibold tracking-wider"
+                className="block text-sm text-slate-200 hover:text-rose-400 active:text-rose-300 py-2.5 px-3 rounded-lg hover:bg-rose-950/30 transition-colors border-b border-rose-900/20 font-semibold tracking-wider flex items-center justify-between"
               >
-                {item.label}
+                <span>{item.label}</span>
+                <span className="text-rose-600 text-xs">→</span>
               </a>
             ))}
           </motion.div>

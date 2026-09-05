@@ -8,8 +8,7 @@ const SECTIONS = [
   { id: 'hero', label: '01 // HERO' },
   { id: 'skills', label: '02 // SKILL MATRIX' },
   { id: 'projects', label: '03 // PROJECTS' },
-  { id: 'terminal', label: '04 // KALI LAB' },
-  { id: 'contact', label: '05 // TRANSMISSION' },
+  { id: 'contact', label: '04 // TRANSMISSION' },
 ];
 
 export const ScrollytellerNav: React.FC = () => {
